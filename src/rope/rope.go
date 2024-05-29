@@ -5,7 +5,7 @@ import (
 	"unicode/utf8"
 )
 
-const LEAF_LEN int = 3
+const LEAF_LEN int = 6
 
 type Rope struct {
 	left   *Rope
@@ -62,38 +62,50 @@ func create_rope(rope *Rope, parent *Rope, str *string, L int, R int) {
 	}
 }
 
-func (rope *Rope) Insert(index int, value *string) {
+func (rope *Rope) Insert(index int, value string) {
 	temp_rope := rope // this is the leaf that we merge the value with
 	t_index := index
 	for temp_rope.left != nil && temp_rope.right != nil {
 		if t_index >= temp_rope.count {
-			t_index = t_index - temp_rope.count
+			t_index = t_index - temp_rope.count - 1
 			temp_rope = temp_rope.right
 		} else {
 			temp_rope = temp_rope.left
 		}
 	}
-	new_data := temp_rope.str[:t_index] + *value + temp_rope.str[t_index:]
+	new_data := temp_rope.str[:t_index] + value + temp_rope.str[t_index:]
 	str_ln := utf8.RuneCountInString(new_data)
 	temp_rope.str = ""
 	create_rope(temp_rope, temp_rope, &new_data, 0, str_ln-1)
 	re_balance(rope)
 }
+func (rope *Rope) Append(value string) {
+	str := rope.ToString()
+	str_ln := utf8.RuneCountInString(*str)
+	rope.Insert(str_ln, value)
+}
+func (rope *Rope) Prepend(value string) {
+	rope.Insert(0, value)
+}
+func (rope *Rope) Length() int {
+	str := rope.ToString()
+	return utf8.RuneCountInString(*str)
+}
 
-func (rope *Rope) Report() *string {
+func (rope *Rope) ToString() *string {
 	if rope == nil {
 		return nil
 	} else if rope.right == nil && rope.left == nil {
 		return &rope.str
 	}
-	left_str := *rope.left.Report()
-	right_str := *rope.right.Report()
+	left_str := *rope.left.ToString()
+	right_str := *rope.right.ToString()
 	res := left_str + right_str
 	return &res
 }
 
 func re_balance(rope *Rope) {
-	str := rope.Report()
+	str := rope.ToString()
 	str_ln := utf8.RuneCountInString(*str)
 	create_rope(rope, nil, str, 0, str_ln-1)
 }
