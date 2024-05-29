@@ -19,16 +19,18 @@ func (rope *Rope) From_str(str *string) {
 	str_len := utf8.RuneCountInString(*str)
 	create_rope(rope, nil, str, 0, str_len-1)
 }
-
 func (rope *Rope) Print() {
-	// fmt.Printf("[%s] %+v\n", str, rope)
+	rope.print()
+	fmt.Printf("\n")
+}
+func (rope *Rope) print() {
 	if rope == nil {
 		return
 	} else if rope.right == nil && rope.left == nil {
 		fmt.Printf("%s", rope.str)
 	}
-	rope.left.Print()
-	rope.right.Print()
+	rope.left.print()
+	rope.right.print()
 }
 
 func (rope *Rope) Depth() int {
@@ -46,7 +48,6 @@ func (rope *Rope) Depth() int {
 }
 
 func create_rope(rope *Rope, parent *Rope, str *string, L int, R int) {
-	// fmt.Printf("L: %d - R: %d - mid: %d\n", L, R, (L+R)/2)
 	rope.parent = parent
 	if (R - L) > LEAF_LEN {
 		rope.count = (R - L) / 2
@@ -65,14 +66,12 @@ func (rope *Rope) Insert(index int, value *string) {
 	temp_rope := rope // this is the leaf that we merge the value with
 	t_index := index
 	for temp_rope.left != nil && temp_rope.right != nil {
-		// fmt.Printf("\nBEFORE::index: %d - rope count: %d\n", t_index, temp_rope.count)
 		if t_index >= temp_rope.count {
 			t_index = t_index - temp_rope.count
 			temp_rope = temp_rope.right
 		} else {
 			temp_rope = temp_rope.left
 		}
-		// fmt.Printf("\nAFTER::index: %d - rope count: %d\n", t_index, temp_rope.count)
 	}
 	new_data := temp_rope.str[:t_index] + *value + temp_rope.str[t_index:]
 	str_ln := utf8.RuneCountInString(new_data)
