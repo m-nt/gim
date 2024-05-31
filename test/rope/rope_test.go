@@ -24,6 +24,16 @@ func Test_rope_length(t *testing.T) {
 		t.Fail()
 	}
 }
+func Test_rope_insert(t *testing.T) {
+	rope := rope.Rope{}
+	str := "THIS IS A TEST FILE FOR CREATING ROPE"
+	rope.From_str(&str)
+	rope.Insert(3, "INSERTED")
+	rope.Print()
+	if (*rope.ToString())[3:11] != "INSERTED" {
+		t.Fail()
+	}
+}
 func Test_rope_append(t *testing.T) {
 	rope := rope.Rope{}
 	str := "THIS IS A TEST FILE FOR CREATING ROPE"
@@ -59,4 +69,45 @@ func Test_rope_depth(t *testing.T) {
 	if depth != rope.Depth() {
 		t.Fail()
 	}
+}
+
+func Test_rope_concat(t *testing.T) {
+	str1 := "FIRST PART"
+	str2 := " AND SECOND PART"
+
+	rope1 := rope.Rope{}
+	rope1.From_str(&str1)
+	rope2 := rope.Rope{}
+	rope2.From_str(&str2)
+
+	new_rope := rope1.Concat(&rope2)
+
+	if new_rope.Length() != rope1.Length()+rope2.Length() {
+		t.Fail()
+	}
+}
+func Test_rope_split(t *testing.T) {
+	str := "SPLIT MESPLIT ME"
+	rope := &rope.Rope{}
+	rope.From_str(&str)
+	right := rope.Split(8)
+	if *rope.ToString() != *right.ToString() {
+		t.Fail()
+	}
+}
+
+func Test_rope_delete(t *testing.T) {
+	str := "THIS IS A TEST <TO_BE_DELETED> FILE FOR CREATING ROPE"
+	rope := &rope.Rope{}
+	rope.From_str(&str)
+	deleted := rope.Delete(15, 30)
+	if *deleted.ToString() != "<TO_BE_DELETED>" {
+		t.Fail()
+	}
+}
+func Test_rope_path(t *testing.T) {
+	str := "THIS IS A TEST FILE FOR CREATING ROPE"
+	rope := &rope.Rope{}
+	rope.From_str(&str)
+	rope.Path()
 }
