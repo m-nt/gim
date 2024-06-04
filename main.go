@@ -28,20 +28,18 @@ func main() {
 			}
 		}
 	}()
+	line := 0
 	for {
 		run := <-buff
 		if run == 0x3 {
 			panic("Exit")
 		}
 		if run == 0xD {
-			fmt.Printf("\x1b[H\x1b[1B")
+			line++
+			fmt.Printf("\x1b[H\x1b[%dB", line)
 		}
-		if run == 0x63 {
+		if run < 0xFF {
 			fmt.Printf("%c", run)
 		}
-		if run == 0x61 {
-			fmt.Printf("%c", run)
-		}
-		fmt.Printf("%x\n", run)
 	}
 }
