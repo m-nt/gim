@@ -21,7 +21,7 @@ func isatty(fd uintptr) bool {
 }
 
 func Reset() {
-	err := unix.IoctlSetTermios(unix.Stdin, unix.TCSETA, &saved_term)
+	err := unix.IoctlSetTermios(unix.Stdin, unix.TCSETS, &saved_term)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		panic(err.Error())
@@ -36,15 +36,15 @@ func Set() {
 		panic("Could not get termios")
 	}
 	saved_term = *term_tmp
-	// term_tmp.Lflag &^= syscall.ECHO | syscall.ECHONL | syscall.ICANON | syscall.ISIG | syscall.IEXTEN
-	// term_tmp.Iflag &^= syscall.IGNBRK | syscall.BRKINT | syscall.PARMRK | syscall.ISTRIP | syscall.INLCR | syscall.IGNCR | syscall.ICRNL | syscall.IXON
-	// term_tmp.Oflag &^= syscall.OPOST
-	// term_tmp.Cflag &^= syscall.CSIZE | syscall.PARENB
-	// term_tmp.Cflag |= syscall.CS8
-	// term_tmp.Cc[syscall.VMIN] = 1
-	// term_tmp.Cc[syscall.VTIME] = 0
+	term_tmp.Lflag &^= syscall.ECHO | syscall.ECHONL | syscall.ICANON | syscall.ISIG | syscall.IEXTEN
+	term_tmp.Iflag &^= syscall.IGNBRK | syscall.BRKINT | syscall.PARMRK | syscall.ISTRIP | syscall.INLCR | syscall.IGNCR | syscall.ICRNL | syscall.IXON
+	term_tmp.Oflag &^= syscall.OPOST
+	term_tmp.Cflag &^= syscall.CSIZE | syscall.PARENB
+	term_tmp.Cflag |= syscall.CS8
+	term_tmp.Cc[syscall.VMIN] = 1
+	term_tmp.Cc[syscall.VTIME] = 0
 
-	err2 := unix.IoctlSetTermios(unix.Stdin, unix.TCSETA, term_tmp)
+	err2 := unix.IoctlSetTermios(unix.Stdin, unix.TCSETS, term_tmp)
 	if err2 != nil {
 		panic("Could not set termios")
 	}
