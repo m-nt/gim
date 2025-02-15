@@ -1,6 +1,7 @@
 package gterm
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"syscall"
@@ -47,5 +48,43 @@ func Set() {
 	err2 := unix.IoctlSetTermios(unix.Stdin, unix.TCSETS, term_tmp)
 	if err2 != nil {
 		panic("Could not set termios")
+	}
+}
+
+type TerminalContext struct {
+}
+
+func Open_terminal() {
+	defer func() {
+		if r := recover(); r != nil {
+			Reset()
+			fmt.Printf("\x1b[H\x1b[2J")
+		}
+	}()
+	Set()
+	fmt.Printf("\x1b[H\x1b[2J")
+	reader := bufio.NewReader(os.Stdin)
+	buff := make(chan byte)
+	go func() {
+		for {
+			char, err := reader.ReadByte()
+			if err == nil {
+				buff <- char
+			}
+		}
+	}()
+	line := 0
+	for {
+		run := <-buff
+		if run == 0x3 {
+			panic("Exit")
+		}
+		if run == 0xD {
+			line++
+			fmt.Printf("\x1b[H\x1b[%dB", line)
+		}
+		if run < 0xFF {
+			fmt.Printf("%c", run)
+		}
 	}
 }
